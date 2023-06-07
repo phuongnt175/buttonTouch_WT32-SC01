@@ -4,9 +4,12 @@
 #include <LovyanGFX.hpp>
 #include <FT6236.h>
 #include <ui.h>
+
 #define SDA_FT6236 18
 #define SCL_FT6236 19
 FT6236 ts = FT6236();
+
+extern int brightnessValue;
 
 class LGFX : public lgfx::LGFX_Device
 {
@@ -21,8 +24,8 @@ public:
       auto cfg = _bus_instance.config();    
       cfg.spi_host = VSPI_HOST;    
       cfg.spi_mode = 0;            
-      cfg.freq_write = 40000000;   
-      cfg.freq_read  = 16000000;    
+      cfg.freq_write = 40000000;   //40000000
+      cfg.freq_read  = 16000000;    //16000000
       cfg.spi_3wire  = false;       
       cfg.use_lock   = true;        
       cfg.dma_channel = 1;         
@@ -148,5 +151,6 @@ void setup()
 void loop()
 {
    lv_timer_handler(); /* let the GUI do its work */
+   tft.setBrightness(brightnessValue);
    delay( 5 );
 }
