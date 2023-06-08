@@ -162,11 +162,29 @@ void ui_Screen2_screen_init(void)
     lv_obj_set_style_text_color(ui_sysInfoT, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui_sysInfoT, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
 
+    ui_Button2 = lv_btn_create(ui_sc2SystemPanel);
+    lv_obj_set_width(ui_Button2, 180);
+    lv_obj_set_height(ui_Button2, 50);
+    lv_obj_set_align(ui_Button2, LV_ALIGN_RIGHT_MID);
+    lv_obj_add_flag(ui_Button2, LV_OBJ_FLAG_SCROLL_ON_FOCUS);     /// Flags
+    lv_obj_clear_flag(ui_Button2, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    lv_obj_set_style_bg_color(ui_Button2, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(ui_Button2, 150, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_Label7 = lv_label_create(ui_Button2);
+    lv_obj_set_width(ui_Label7, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_Label7, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_align(ui_Label7, LV_ALIGN_CENTER);
+    lv_label_set_text(ui_Label7, "CHANGE THEME COLOR");
+    lv_obj_set_style_text_color(ui_Label7, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_opa(ui_Label7, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+
     lv_obj_add_event_cb(ui_BrightnessSlider, ui_event_BrightnessSlider, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(ui_muteButton, ui_event_muteButton, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(ui_lowButton, ui_event_lowButton, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(ui_highButton, ui_event_highButton, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(ui_SysInfoBut, ui_event_SysInfoBut, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(ui_Button2, ui_event_Button2, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(ui_Screen2, ui_event_Screen2, LV_EVENT_ALL, NULL);
 
 }

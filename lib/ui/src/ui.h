@@ -30,8 +30,8 @@ void ui_event_Screen1(lv_event_t * e);
 extern lv_obj_t * ui_Screen1;
 extern lv_obj_t * ui_sc1MainPanel;
 extern lv_obj_t * ui_secondButton;
-extern lv_obj_t * ui_Image1;
 extern lv_obj_t * ui_Label1;
+extern lv_obj_t * ui_Image1;
 extern lv_obj_t * ui_firstButton;
 extern lv_obj_t * ui_Label2;
 extern lv_obj_t * ui_Image2;
@@ -65,6 +65,9 @@ extern lv_obj_t * ui_sc2SystemPanel;
 void ui_event_SysInfoBut(lv_event_t * e);
 extern lv_obj_t * ui_SysInfoBut;
 extern lv_obj_t * ui_sysInfoT;
+void ui_event_Button2(lv_event_t * e);
+extern lv_obj_t * ui_Button2;
+extern lv_obj_t * ui_Label7;
 // SCREEN: ui_Screen3
 void ui_Screen3_screen_init(void);
 extern lv_obj_t * ui_Screen3;
@@ -73,14 +76,20 @@ extern lv_obj_t * ui_sysSpec;
 void ui_event_backButton(lv_event_t * e);
 extern lv_obj_t * ui_backButton;
 extern lv_obj_t * ui_backT;
+// SCREEN: ui_Screen4
+void ui_Screen4_screen_init(void);
+extern lv_obj_t * ui_Screen4;
+extern lv_obj_t * ui_Colorwheel1;
+void ui_event_Button1(lv_event_t * e);
+extern lv_obj_t * ui_Button1;
+extern lv_obj_t * ui_Label8;
 extern lv_obj_t * ui____initial_actions0;
 
 LV_IMG_DECLARE(ui_img_1862871016);    // assets\wallpapersden.com_beautiful-scenery-mountains-lake_480x320.png
-LV_IMG_DECLARE(ui_img_61764384);    // assets\icons8-lamp-64.png
+LV_IMG_DECLARE(ui_img_lamp_png);    // assets\lamp.png
 LV_IMG_DECLARE(ui_img_801059491);    // assets\curtains (1).png
 LV_IMG_DECLARE(ui_img_2047347433);    // assets\air-conditioner.png
 LV_IMG_DECLARE(ui_img_30409_treecanopy_v1_920485_png);    // assets\30409_treecanopy_v1_920485.png
-LV_IMG_DECLARE(ui_img_1222115965);    // assets\icons8-curtain-50.png
 
 void ui_init(void);
 
