@@ -9,7 +9,7 @@ void ui_Screen1_screen_init(void)
 {
     ui_Screen1 = lv_obj_create(NULL);
     lv_obj_clear_flag(ui_Screen1, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
-    lv_obj_set_style_bg_img_src(ui_Screen1, &ui_img_1862871016, LV_PART_MAIN | LV_STATE_DEFAULT);
+    //lv_obj_set_style_bg_img_src(ui_Screen1, &ui_img_1862871016, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_sc1MainPanel = lv_obj_create(ui_Screen1);
     lv_obj_set_width(ui_sc1MainPanel, 480);
@@ -22,11 +22,9 @@ void ui_Screen1_screen_init(void)
     lv_obj_set_style_bg_opa(ui_sc1MainPanel, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_secondButton = lv_btn_create(ui_sc1MainPanel);
-    lv_obj_set_width(ui_secondButton, 150);
-    lv_obj_set_height(ui_secondButton, 300);
-    lv_obj_set_x(ui_secondButton, -1);
-    lv_obj_set_y(ui_secondButton, 0);
-    lv_obj_set_align(ui_secondButton, LV_ALIGN_CENTER);
+    lv_obj_set_width(ui_secondButton, 220);
+    lv_obj_set_height(ui_secondButton, 140);
+    lv_obj_set_align(ui_secondButton, LV_ALIGN_TOP_RIGHT);
     lv_obj_add_flag(ui_secondButton, LV_OBJ_FLAG_CHECKABLE | LV_OBJ_FLAG_SCROLL_ON_FOCUS);     /// Flags
     lv_obj_clear_flag(ui_secondButton, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
     lv_obj_set_style_radius(ui_secondButton, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -51,11 +49,8 @@ void ui_Screen1_screen_init(void)
     lv_obj_clear_flag(ui_Image1, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
 
     ui_firstButton = lv_btn_create(ui_sc1MainPanel);
-    lv_obj_set_width(ui_firstButton, 150);
-    lv_obj_set_height(ui_firstButton, 300);
-    lv_obj_set_x(ui_firstButton, -155);
-    lv_obj_set_y(ui_firstButton, 1);
-    lv_obj_set_align(ui_firstButton, LV_ALIGN_CENTER);
+    lv_obj_set_width(ui_firstButton, 220);
+    lv_obj_set_height(ui_firstButton, 140);
     lv_obj_add_flag(ui_firstButton, LV_OBJ_FLAG_CHECKABLE | LV_OBJ_FLAG_SCROLL_ON_FOCUS);     /// Flags
     lv_obj_clear_flag(ui_firstButton, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
     lv_obj_set_style_radius(ui_firstButton, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -80,11 +75,9 @@ void ui_Screen1_screen_init(void)
     lv_obj_clear_flag(ui_Image2, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
 
     ui_thirdButton = lv_btn_create(ui_sc1MainPanel);
-    lv_obj_set_width(ui_thirdButton, 155);
-    lv_obj_set_height(ui_thirdButton, 300);
-    lv_obj_set_x(ui_thirdButton, 156);
-    lv_obj_set_y(ui_thirdButton, 0);
-    lv_obj_set_align(ui_thirdButton, LV_ALIGN_CENTER);
+    lv_obj_set_width(ui_thirdButton, 220);
+    lv_obj_set_height(ui_thirdButton, 140);
+    lv_obj_set_align(ui_thirdButton, LV_ALIGN_BOTTOM_LEFT);
     lv_obj_add_flag(ui_thirdButton, LV_OBJ_FLAG_CHECKABLE | LV_OBJ_FLAG_SCROLL_ON_FOCUS);     /// Flags
     lv_obj_clear_flag(ui_thirdButton, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
     lv_obj_set_style_radius(ui_thirdButton, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -109,11 +102,9 @@ void ui_Screen1_screen_init(void)
     lv_label_set_text(ui_Label4, "Curtain");
 
     ui_forthButton = lv_btn_create(ui_sc1MainPanel);
-    lv_obj_set_width(ui_forthButton, 150);
-    lv_obj_set_height(ui_forthButton, 300);
-    lv_obj_set_x(ui_forthButton, 312);
-    lv_obj_set_y(ui_forthButton, 0);
-    lv_obj_set_align(ui_forthButton, LV_ALIGN_CENTER);
+    lv_obj_set_width(ui_forthButton, 220);
+    lv_obj_set_height(ui_forthButton, 140);
+    lv_obj_set_align(ui_forthButton, LV_ALIGN_BOTTOM_RIGHT);
     lv_obj_add_flag(ui_forthButton, LV_OBJ_FLAG_CHECKABLE | LV_OBJ_FLAG_SCROLL_ON_FOCUS);     /// Flags
     lv_obj_clear_flag(ui_forthButton, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
     lv_obj_set_style_radius(ui_forthButton, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -138,5 +129,8 @@ void ui_Screen1_screen_init(void)
     lv_label_set_text(ui_Label5, "Air Conditioner");
 
     lv_obj_add_event_cb(ui_Screen1, ui_event_Screen1, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(ui_firstButton, ui_event_firstButton, LV_EVENT_ALL, NULL);
 
 }
+
+
