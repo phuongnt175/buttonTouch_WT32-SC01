@@ -10,7 +10,6 @@
 
 // SCREEN: ui_Screen1
 void ui_Screen1_screen_init(void);
-void ui_event_Screen1(lv_event_t * e);
 lv_obj_t * ui_Screen1;
 lv_obj_t * ui_sc1MainPanel;
 lv_obj_t * ui_secondButton;
@@ -25,6 +24,7 @@ lv_obj_t * ui_Label4;
 lv_obj_t * ui_forthButton;
 lv_obj_t * ui_Image5;
 lv_obj_t * ui_Label5;
+
 
 // SCREEN: ui_Screen2
 void ui_Screen2_screen_init(void);
@@ -96,6 +96,7 @@ void ui_event_Screen1(lv_event_t * e)
         _ui_screen_change(ui_Screen2, LV_SCR_LOAD_ANIM_MOVE_BOTTOM, 500, 0);
     }
 }
+
 void ui_event_Screen2(lv_event_t * e)
 {
     lv_event_code_t event_code = lv_event_get_code(e);
@@ -112,7 +113,6 @@ void ui_event_BrightnessSlider(lv_event_t * e)
     if(event_code == LV_EVENT_VALUE_CHANGED) {
         _ui_slider_set_text_value(ui_Label6, target, "", "");
     }
-
     brightnessValue = (int)lv_slider_get_value(target);
 }
 void ui_event_muteButton(lv_event_t * e)
