@@ -129,7 +129,7 @@ void ui_Screen1_screen_init(void)
     lv_label_set_text(ui_Label5, "Air Conditioner");
 
     lv_obj_add_event_cb(ui_Screen1, ui_event_Screen1, LV_EVENT_ALL, NULL);
-    //lv_obj_add_event_cb(ui_firstButton, ui_event_firstButton, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(ui_firstButton, ui_event_firstButton, LV_EVENT_ALL, NULL);
 
 }
 

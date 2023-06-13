@@ -18,8 +18,9 @@ const char *password = "lumivn274!";
 const char* PARAM_INPUT_1 = "output";
 const char* PARAM_INPUT_2 = "state";
 
-int buttonState;
-int ledState = LOW;
+int btnstate = LOW;
+
+static int flag = 0;
 
 // Create AsyncWebServer object on port 80
 AsyncWebServer server(80);
@@ -137,7 +138,7 @@ void my_touchpad_read( lv_indev_drv_t * indev_driver, lv_indev_data_t * data )
 const char index_html[] PROGMEM = R"rawliteral(
 <!DOCTYPE HTML><html>
 <head>
-  <title>ESP Web Server</title>
+  <title>Demo WT32-SC01 Wifi Controller</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" href="data:,">
   <style>
@@ -154,7 +155,7 @@ const char index_html[] PROGMEM = R"rawliteral(
   </style>
 </head>
 <body>
-  <h2>ESP Web Server</h2>
+  <h2>WT32-SC01 Wifi Controller</h2>
   %BUTTONPLACEHOLDER%
 <script>function toggleCheckbox(element) {
   var xhr = new XMLHttpRequest();
@@ -194,10 +195,10 @@ String processor(const String& var){
   //Serial.println(var);
   if(var == "BUTTONPLACEHOLDER"){
     String buttons = "";
-    buttons += "<h4> Living Room Light  </h4><label class=\"switch\"><input type=\"checkbox\" onchange=\"toggleCheckbox(this)\" id=\"Living Room Light\" " "> <span class=\"slider\"></span></label>";
-    buttons += "<h4> Kitchen Room Light </h4><label class=\"switch\"><input type=\"checkbox\" onchange=\"toggleCheckbox(this)\" id=\"Kitchen Room Light\" " "><span class=\"slider\"></span></label>";
-    buttons += "<h4> Curtain Mode       </h4><label class=\"switch\"><input type=\"checkbox\" onchange=\"toggleCheckbox(this)\" id=\"Curtain Mode\" " ">      <span class=\"slider\"></span></label>";
-    buttons += "<h4> AC                 </h4><label class=\"switch\"><input type=\"checkbox\" onchange=\"toggleCheckbox(this)\" id=\"AC\" " ">                <span class=\"slider\"></span></label>";
+    buttons += "<h4> Living Room Light  </h4><label class=\"switch\"><input type=\"checkbox\" onchange=\"toggleCheckbox(this)\" id=\"1\" " "><span class=\"slider\"></span></label>";
+    buttons += "<h4> Kitchen Room Light </h4><label class=\"switch\"><input type=\"checkbox\" onchange=\"toggleCheckbox(this)\" id=\"2\" " "><span class=\"slider\"></span></label>";
+    buttons += "<h4> Curtain Mode       </h4><label class=\"switch\"><input type=\"checkbox\" onchange=\"toggleCheckbox(this)\" id=\"3\" " "><span class=\"slider\"></span></label>";
+    buttons += "<h4> AC                 </h4><label class=\"switch\"><input type=\"checkbox\" onchange=\"toggleCheckbox(this)\" id=\"4\" " "><span class=\"slider\"></span></label>";
     return buttons;
   }
   return String();
@@ -257,23 +258,36 @@ void setup()
     inputMessage1 = request->getParam(PARAM_INPUT_1)->value();
     inputMessage2 = request->getParam(PARAM_INPUT_2)->value();
     //digitalWrite(inputMessage1.toInt(), inputMessage2.toInt());
-    _ui_state_modify(ui_firstButton, LV_STATE_CHECKED, (inputMessage2.toInt()+1));
-    ledState = !ledState;
+    switch (inputMessage1.toInt())
+    {
+      case 1:
+        btnstate = !btnstate;
+      break;
+
+      case 2:
+        _ui_state_modify(ui_secondButton, LV_STATE_CHECKED, (inputMessage2.toInt()+1));
+      break;
+
+      case 3:
+        _ui_state_modify(ui_thirdButton, LV_STATE_CHECKED, (inputMessage2.toInt()+1));
+      break;
+
+      case 4:
+       _ui_state_modify(ui_forthButton, LV_STATE_CHECKED, (inputMessage2.toInt()+1));
+      break;
+      
+      default:
+      break;
+    }
   }
   else {
     inputMessage1 = "No message sent";
     inputMessage2 = "No message sent";
   }
-  //Serial.print("GPIO: ");
   Serial.print(inputMessage1);
   Serial.print(" - : ");
   Serial.println(inputMessage2);
   request->send(200, "text/plain", "OK");
-});
-
-server.on("/state", HTTP_GET, [] (AsyncWebServerRequest *request)
-{
-  request->send(200, "text/plaint", String(lv_obj_get_state(ui_firstButton)).c_str());
 });
 
   server.begin();
@@ -285,19 +299,18 @@ void loop()
 {
   lv_timer_handler(); /* let the GUI do its work */
 
-  int flag1 = lv_obj_get_state(ui_firstButton);
-
-  //Serial.println(flag1);
-
-  if (flag1 != buttonState) {
-    buttonState = flag1;
-
-    // only toggle the LED if the new button state is HIGH
-    if (buttonState == HIGH) {
-      ledState = !ledState;
+  if(btnstate != flag)
+  {
+    flag = btnstate;
+    if(btnstate)
+    {
+      _ui_state_modify(ui_firstButton, LV_STATE_CHECKED, btnstate+1);
+    }
+    else
+    {
+      _ui_state_modify(ui_firstButton, LV_STATE_CHECKED, _UI_MODIFY_STATE_REMOVE);
     }
   }
-  Serial.println(ledState);
   
   tft.setBrightness(brightnessValue); //change screen brightness according to slider's value
 
@@ -307,15 +320,25 @@ void loop()
   lv_obj_set_style_bg_color(ui_Screen3, lv_colorwheel_get_rgb(ui_Colorwheel1), LV_PART_MAIN | LV_STATE_DEFAULT);
   lv_obj_set_style_bg_color(ui_Screen4, lv_colorwheel_get_rgb(ui_Colorwheel1), LV_PART_MAIN | LV_STATE_DEFAULT);
 
+  
+
   delay( 5 );
 }
 
-// void ui_event_firstButton(lv_event_t * e)
-// {
-//   lv_event_code_t event_code = lv_event_get_code(e);
-//   lv_obj_t * target = lv_event_get_target(e);
-//   if(event_code == LV_EVENT_VALUE_CHANGED)
-//   {
-
-//   }
-// }
+void ui_event_firstButton(lv_event_t * e)
+{
+  lv_event_code_t event_code = lv_event_get_code(e);
+  lv_obj_t * target = lv_event_get_target(e);
+  if(event_code == LV_EVENT_VALUE_CHANGED)
+  {
+    btnstate = !btnstate;
+    Serial.println(String(btnstate).c_str());
+    server.on("/state", HTTP_GET, [] (AsyncWebServerRequest *request)
+    {
+      request->send(200, "text/plaint", String(btnstate).c_str());
+      // request->send(200, "text/plaint", String(lv_obj_get_state(ui_secondButton)).c_str());
+      // request->send(200, "text/plaint", String(lv_obj_get_state(ui_thirdButton)).c_str());
+      // request->send(200, "text/plaint", String(lv_obj_get_state(ui_forthButton)).c_str());
+    });
+  }
+}
