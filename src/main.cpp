@@ -18,10 +18,6 @@ const char *password = "lumivn274!";
 const char* PARAM_INPUT_1 = "output";
 const char* PARAM_INPUT_2 = "state";
 
-int btnstate = LOW;
-
-static int flag = 0;
-
 // Create AsyncWebServer object on port 80
 AsyncWebServer server(80);
 
@@ -178,27 +174,38 @@ setInterval(function ( ) {
         inputChecked = false;
         outputStateM = "Off";
       }
-      document.getElementById("output").checked = inputChecked;
-      document.getElementById("outputState").innerHTML = outputStateM;
+      document.getElementById("1").checked = inputChecked;
+      document.getElementById("1").innerHTML = outputStateM;
     }
   };
   xhttp.open("GET", "/state", true);
   xhttp.send();
 }, 1000 ) ;
+
 </script>
 </body>
 </html>
 )rawliteral";
+
+String outputState(lv_obj_t *ui){
+  if(lv_obj_get_state(ui)-2){
+    return "checked";
+  }
+  else {
+    return "";
+  }
+  return "";
+}
 
 // Replaces placeholder with button section in your web page
 String processor(const String& var){
   //Serial.println(var);
   if(var == "BUTTONPLACEHOLDER"){
     String buttons = "";
-    buttons += "<h4> Living Room Light  </h4><label class=\"switch\"><input type=\"checkbox\" onchange=\"toggleCheckbox(this)\" id=\"1\" " "><span class=\"slider\"></span></label>";
-    buttons += "<h4> Kitchen Room Light </h4><label class=\"switch\"><input type=\"checkbox\" onchange=\"toggleCheckbox(this)\" id=\"2\" " "><span class=\"slider\"></span></label>";
-    buttons += "<h4> Curtain Mode       </h4><label class=\"switch\"><input type=\"checkbox\" onchange=\"toggleCheckbox(this)\" id=\"3\" " "><span class=\"slider\"></span></label>";
-    buttons += "<h4> AC                 </h4><label class=\"switch\"><input type=\"checkbox\" onchange=\"toggleCheckbox(this)\" id=\"4\" " "><span class=\"slider\"></span></label>";
+    buttons += "<h4> Living Room Light  </h4><label class=\"switch\"><input type=\"checkbox\" onchange=\"toggleCheckbox(this)\" id=\"1\" "+ outputState(ui_firstButton) +"><span class=\"slider\"></span></label>";
+    buttons += "<h4> Kitchen Room Light </h4><label class=\"switch\"><input type=\"checkbox\" onchange=\"toggleCheckbox(this)\" id=\"2\" "+ outputState(ui_secondButton) +"><span class=\"slider\"></span></label>";
+    buttons += "<h4> Curtain Mode       </h4><label class=\"switch\"><input type=\"checkbox\" onchange=\"toggleCheckbox(this)\" id=\"3\" "+ outputState(ui_thirdButton) +"><span class=\"slider\"></span></label>";
+    buttons += "<h4> AC                 </h4><label class=\"switch\"><input type=\"checkbox\" onchange=\"toggleCheckbox(this)\" id=\"4\" "+ outputState(ui_forthButton) +"><span class=\"slider\"></span></label>";
     return buttons;
   }
   return String();
@@ -261,7 +268,7 @@ void setup()
     switch (inputMessage1.toInt())
     {
       case 1:
-        btnstate = !btnstate;
+        _ui_state_modify(ui_firstButton, LV_STATE_CHECKED, (inputMessage2.toInt()+1));
       break;
 
       case 2:
@@ -290,6 +297,10 @@ void setup()
   request->send(200, "text/plain", "OK");
 });
 
+  server.on("/state", HTTP_GET, [] (AsyncWebServerRequest *request) {
+  request->send(200, "text/plain", String(lv_obj_get_state(ui_firstButton)-2).c_str());
+  });
+
   server.begin();
 
   ui_init();
@@ -298,19 +309,6 @@ void setup()
 void loop()
 {
   lv_timer_handler(); /* let the GUI do its work */
-
-  if(btnstate != flag)
-  {
-    flag = btnstate;
-    if(btnstate)
-    {
-      _ui_state_modify(ui_firstButton, LV_STATE_CHECKED, btnstate+1);
-    }
-    else
-    {
-      _ui_state_modify(ui_firstButton, LV_STATE_CHECKED, _UI_MODIFY_STATE_REMOVE);
-    }
-  }
   
   tft.setBrightness(brightnessValue); //change screen brightness according to slider's value
 
@@ -320,25 +318,5 @@ void loop()
   lv_obj_set_style_bg_color(ui_Screen3, lv_colorwheel_get_rgb(ui_Colorwheel1), LV_PART_MAIN | LV_STATE_DEFAULT);
   lv_obj_set_style_bg_color(ui_Screen4, lv_colorwheel_get_rgb(ui_Colorwheel1), LV_PART_MAIN | LV_STATE_DEFAULT);
 
-  
-
   delay( 5 );
-}
-
-void ui_event_firstButton(lv_event_t * e)
-{
-  lv_event_code_t event_code = lv_event_get_code(e);
-  lv_obj_t * target = lv_event_get_target(e);
-  if(event_code == LV_EVENT_VALUE_CHANGED)
-  {
-    btnstate = !btnstate;
-    Serial.println(String(btnstate).c_str());
-    server.on("/state", HTTP_GET, [] (AsyncWebServerRequest *request)
-    {
-      request->send(200, "text/plaint", String(btnstate).c_str());
-      // request->send(200, "text/plaint", String(lv_obj_get_state(ui_secondButton)).c_str());
-      // request->send(200, "text/plaint", String(lv_obj_get_state(ui_thirdButton)).c_str());
-      // request->send(200, "text/plaint", String(lv_obj_get_state(ui_forthButton)).c_str());
-    });
-  }
 }
