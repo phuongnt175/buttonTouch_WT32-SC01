@@ -178,7 +178,29 @@ setInterval(function ( ) {
       document.getElementById("1").innerHTML = outputStateM;
     }
   };
-  xhttp.open("GET", "/state", true);
+  xhttp.open("GET", "/state1", true);
+  xhttp.send();
+}, 1000 ) ;
+
+setInterval(function ( ) {
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      var inputChecked;
+      var outputStateM;
+      if( this.responseText == 1){ 
+        inputChecked = true;
+        outputStateM = "On";
+      }
+      else { 
+        inputChecked = false;
+        outputStateM = "Off";
+      }
+      document.getElementById("2").checked = inputChecked;
+      document.getElementById("2").innerHTML = outputStateM;
+    }
+  };
+  xhttp.open("GET", "/state2", true);
   xhttp.send();
 }, 1000 ) ;
 
@@ -297,8 +319,12 @@ void setup()
   request->send(200, "text/plain", "OK");
 });
 
-  server.on("/state", HTTP_GET, [] (AsyncWebServerRequest *request) {
+  server.on("/state1", HTTP_GET, [] (AsyncWebServerRequest *request) {
   request->send(200, "text/plain", String(lv_obj_get_state(ui_firstButton)-2).c_str());
+  });
+
+  server.on("/state2", HTTP_GET, [] (AsyncWebServerRequest *request) {
+  request->send(200, "text/plain", String(lv_obj_get_state(ui_secondButton)-2).c_str());
   });
 
   server.begin();
