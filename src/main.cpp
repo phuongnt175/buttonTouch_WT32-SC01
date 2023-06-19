@@ -5,6 +5,7 @@
 #include <FT6236.h>
 #include <ui.h>
 #include <WiFi.h>
+#include <WebServer.h>
 #include <ESPAsyncWebServer.h>
 #include <AsyncTCP.h>
 
@@ -18,6 +19,18 @@ const char *password = "lumivn274!";
 const char* PARAM_INPUT_1 = "output";
 const char* PARAM_INPUT_2 = "state";
 
+bool btn1state = LOW;
+bool btn2state = LOW;
+bool btn3state = LOW;
+bool btn4state = LOW;
+
+int flag1 = 0;
+int flag2 = 0;
+int flag3 = 0;
+int flag4 = 0;
+
+void btnHandler(lv_obj_t *ui_target, bool btnstate, int flag);
+
 // Create AsyncWebServer object on port 80
 AsyncWebServer server(80);
 
@@ -28,8 +41,6 @@ extern lv_obj_t * ui_Screen2;
 extern lv_obj_t * ui_Screen3;
 extern lv_obj_t * ui_Screen4;
 extern lv_obj_t * ui_Colorwheel1;
-extern int brightnessValue;
-
 class LGFX : public lgfx::LGFX_Device
 {
 lgfx::Panel_ST7796     _panel_instance;
@@ -97,6 +108,9 @@ public:
 
 LGFX tft;
 
+extern int brightnessValue;
+
+
 /*Change to your screen resolution*/
 static const uint32_t screenWidth  = 480;
 static const uint32_t screenHeight = 320;
@@ -134,9 +148,8 @@ void my_touchpad_read( lv_indev_drv_t * indev_driver, lv_indev_data_t * data )
 const char index_html[] PROGMEM = R"rawliteral(
 <!DOCTYPE HTML><html>
 <head>
-  <title>Demo WT32-SC01 Wifi Controller</title>
+  <title>wt32-sc01 demo controller</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="icon" href="data:,">
   <style>
     html {font-family: Arial; display: inline-block; text-align: center;}
     h2 {font-size: 3.0rem;}
@@ -144,14 +157,14 @@ const char index_html[] PROGMEM = R"rawliteral(
     body {max-width: 600px; margin:0px auto; padding-bottom: 25px;}
     .switch {position: relative; display: inline-block; width: 120px; height: 68px} 
     .switch input {display: none}
-    .slider {position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; border-radius: 6px}
-    .slider:before {position: absolute; content: ""; height: 52px; width: 52px; left: 8px; bottom: 8px; background-color: #fff; -webkit-transition: .4s; transition: .4s; border-radius: 3px}
-    input:checked+.slider {background-color: #b30000}
+    .slider {position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; border-radius: 34px}
+    .slider:before {position: absolute; content: ""; height: 52px; width: 52px; left: 8px; bottom: 8px; background-color: #fff; -webkit-transition: .4s; transition: .4s; border-radius: 68px}
+    input:checked+.slider {background-color: #2196F3}
     input:checked+.slider:before {-webkit-transform: translateX(52px); -ms-transform: translateX(52px); transform: translateX(52px)}
   </style>
 </head>
 <body>
-  <h2>WT32-SC01 Wifi Controller</h2>
+  <h2>demo controller</h2>
   %BUTTONPLACEHOLDER%
 <script>function toggleCheckbox(element) {
   var xhr = new XMLHttpRequest();
@@ -164,45 +177,89 @@ setInterval(function ( ) {
   var xhttp = new XMLHttpRequest();
   xhttp.onreadystatechange = function() {
     if (this.readyState == 4 && this.status == 200) {
-      var inputChecked;
-      var outputStateM;
+      var inputChecked1;
+      var outputStateM1;
       if( this.responseText == 1){ 
-        inputChecked = true;
-        outputStateM = "On";
+        inputChecked1 = true;
+        outputStateM1 = "On";
       }
       else { 
-        inputChecked = false;
-        outputStateM = "Off";
+        inputChecked1 = false;
+        outputStateM1 = "Off";
       }
-      document.getElementById("1").checked = inputChecked;
-      document.getElementById("1").innerHTML = outputStateM;
+      document.getElementById("1").checked = inputChecked1;
+      document.getElementById("1").innerHTML = outputStateM1;
     }
   };
   xhttp.open("GET", "/state1", true);
   xhttp.send();
 }, 1000 ) ;
 
-setInterval(function ( ) {
-  var xhttp = new XMLHttpRequest();
-  xhttp.onreadystatechange = function() {
-    if (this.readyState == 4 && this.status == 200) {
-      var inputChecked;
-      var outputStateM;
-      if( this.responseText == 1){ 
-        inputChecked = true;
-        outputStateM = "On";
-      }
-      else { 
-        inputChecked = false;
-        outputStateM = "Off";
-      }
-      document.getElementById("2").checked = inputChecked;
-      document.getElementById("2").innerHTML = outputStateM;
-    }
-  };
-  xhttp.open("GET", "/state2", true);
-  xhttp.send();
-}, 1000 ) ;
+// setInterval(function ( ) {
+//   var xhttp = new XMLHttpRequest();
+//   xhttp.onreadystatechange = function() {
+//     if (this.readyState == 4 && this.status == 200) {
+//       var inputChecked2;
+//       var outputStateM2;
+//       if( this.responseText == 1){ 
+//         inputChecked2 = true;
+//         outputStateM2 = "On";
+//       }
+//       else { 
+//         inputChecked2 = false;
+//         outputStateM2 = "Off";
+//       }
+//       document.getElementById("2").checked = inputChecked2;
+//       document.getElementById("2").innerHTML = outputStateM2;
+//     }
+//   };
+//   xhttp.open("GET", "/state2", true);
+//   xhttp.send();
+// }, 1000 ) ;
+
+// setInterval(function ( ) {
+//   var xhttp = new XMLHttpRequest();
+//   xhttp.onreadystatechange = function() {
+//     if (this.readyState == 4 && this.status == 200) {
+//       var inputChecked3;
+//       var outputStateM3;
+//       if( this.responseText == 1){ 
+//         inputChecked3 = true;
+//         outputStateM3 = "On";
+//       }
+//       else { 
+//         inputChecked3 = false;
+//         outputStateM3 = "Off";
+//       }
+//       document.getElementById("3").checked = inputChecked3;
+//       document.getElementById("3").innerHTML = outputStateM3;
+//     }
+//   };
+//   xhttp.open("GET", "/state3", true);
+//   xhttp.send();
+// }, 1000 ) ;
+
+// setInterval(function ( ) {
+//   var xhttp = new XMLHttpRequest();
+//   xhttp.onreadystatechange = function() {
+//     if (this.readyState == 4 && this.status == 200) {
+//       var inputChecked4;
+//       var outputStateM4;
+//       if( this.responseText == 1){ 
+//         inputChecked4 = true;
+//         outputStateM4 = "On";
+//       }
+//       else { 
+//         inputChecked4 = false;
+//         outputStateM4 = "Off";
+//       }
+//       document.getElementById("4").checked = inputChecked4;
+//       document.getElementById("4").innerHTML = outputStateM4;
+//     }
+//   };
+//   xhttp.open("GET", "/state4", true);
+//   xhttp.send();
+// }, 1000 ) ;
 
 </script>
 </body>
@@ -224,10 +281,10 @@ String processor(const String& var){
   //Serial.println(var);
   if(var == "BUTTONPLACEHOLDER"){
     String buttons = "";
-    buttons += "<h4> Living Room Light  </h4><label class=\"switch\"><input type=\"checkbox\" onchange=\"toggleCheckbox(this)\" id=\"1\" "+ outputState(ui_firstButton) +"><span class=\"slider\"></span></label>";
-    buttons += "<h4> Kitchen Room Light </h4><label class=\"switch\"><input type=\"checkbox\" onchange=\"toggleCheckbox(this)\" id=\"2\" "+ outputState(ui_secondButton) +"><span class=\"slider\"></span></label>";
-    buttons += "<h4> Curtain Mode       </h4><label class=\"switch\"><input type=\"checkbox\" onchange=\"toggleCheckbox(this)\" id=\"3\" "+ outputState(ui_thirdButton) +"><span class=\"slider\"></span></label>";
-    buttons += "<h4> AC                 </h4><label class=\"switch\"><input type=\"checkbox\" onchange=\"toggleCheckbox(this)\" id=\"4\" "+ outputState(ui_forthButton) +"><span class=\"slider\"></span></label>";
+    buttons += "<h4> Living Room Light  </h4><label class=\"switch\"><input type=\"checkbox\" onchange=\"toggleCheckbox(this)\" id=\"1\" " "><span class=\"slider\"></span></label>";
+    buttons += "<h4> Kitchen Room Light </h4><label class=\"switch\"><input type=\"checkbox\" onchange=\"toggleCheckbox(this)\" id=\"2\" " "><span class=\"slider\"></span></label>";
+    buttons += "<h4> Curtain Mode       </h4><label class=\"switch\"><input type=\"checkbox\" onchange=\"toggleCheckbox(this)\" id=\"3\" " "><span class=\"slider\"></span></label>";
+    buttons += "<h4> AC                 </h4><label class=\"switch\"><input type=\"checkbox\" onchange=\"toggleCheckbox(this)\" id=\"4\" " "><span class=\"slider\"></span></label>";
     return buttons;
   }
   return String();
@@ -290,19 +347,22 @@ void setup()
     switch (inputMessage1.toInt())
     {
       case 1:
-        _ui_state_modify(ui_firstButton, LV_STATE_CHECKED, (inputMessage2.toInt()+1));
+        _ui_state_modify(ui_firstButton, LV_STATE_CHECKED, inputMessage2.toInt()+1);
       break;
 
       case 2:
-        _ui_state_modify(ui_secondButton, LV_STATE_CHECKED, (inputMessage2.toInt()+1));
+        _ui_state_modify(ui_secondButton, LV_STATE_CHECKED, inputMessage2.toInt()+1);
+        Serial.println("2");
       break;
 
       case 3:
-        _ui_state_modify(ui_thirdButton, LV_STATE_CHECKED, (inputMessage2.toInt()+1));
+        _ui_state_modify(ui_thirdButton, LV_STATE_CHECKED, inputMessage2.toInt()+1);
+        Serial.println("3");
       break;
 
       case 4:
-       _ui_state_modify(ui_forthButton, LV_STATE_CHECKED, (inputMessage2.toInt()+1));
+       _ui_state_modify(ui_forthButton, LV_STATE_CHECKED, inputMessage2.toInt()+1);
+       Serial.println("4");
       break;
       
       default:
@@ -323,9 +383,17 @@ void setup()
   request->send(200, "text/plain", String(lv_obj_get_state(ui_firstButton)-2).c_str());
   });
 
-  server.on("/state2", HTTP_GET, [] (AsyncWebServerRequest *request) {
-  request->send(200, "text/plain", String(lv_obj_get_state(ui_secondButton)-2).c_str());
-  });
+  // server.on("/state2", HTTP_GET, [] (AsyncWebServerRequest *request) {
+  // request->send(200, "text/plain", String(lv_obj_get_state(ui_secondButton)-2).c_str());
+  // });
+
+  // server.on("/state3", HTTP_GET, [] (AsyncWebServerRequest *request) {
+  // request->send(200, "text/plain", String(lv_obj_get_state(ui_thirdButton)-2).c_str());
+  // });
+
+  // server.on("/state4", HTTP_GET, [] (AsyncWebServerRequest *request) {
+  // request->send(200, "text/plain", String(lv_obj_get_state(ui_forthButton)-2).c_str());
+  // });
 
   server.begin();
 
@@ -345,4 +413,20 @@ void loop()
   lv_obj_set_style_bg_color(ui_Screen4, lv_colorwheel_get_rgb(ui_Colorwheel1), LV_PART_MAIN | LV_STATE_DEFAULT);
 
   delay( 5 );
+}
+
+void btnHandler(lv_obj_t *ui_target, bool btnstate, int flag)
+{
+  if(btnstate != flag)
+  {
+    flag = btnstate;
+    if(btnstate)
+    {
+      _ui_state_modify(ui_target, LV_STATE_CHECKED, _UI_MODIFY_STATE_TOGGLE);
+    }
+    else{
+      _ui_state_modify(ui_target, LV_STATE_CHECKED, _UI_MODIFY_STATE_REMOVE);
+    }
+  }
+  btnstate = !btnstate;
 }
