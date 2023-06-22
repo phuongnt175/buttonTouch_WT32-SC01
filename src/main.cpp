@@ -4,13 +4,29 @@
 #include <LovyanGFX.hpp>
 #include <FT6236.h>
 #include <ui.h>
+#include <WiFi.h>
+#include <WebServer.h>
+#include <ESPAsyncWebServer.h>
+#include <AsyncTCP.h>
 
 #define SDA_FT6236 18
 #define SCL_FT6236 19
 FT6236 ts = FT6236();
 
-extern int brightnessValue;
+const char *ssid = "LUMI_TEST";
+const char *password = "lumivn274!";
 
+const char* PARAM_INPUT_1 = "output";
+const char* PARAM_INPUT_2 = "state";
+
+// Create AsyncWebServer object on port 80
+AsyncWebServer server(80);
+
+extern lv_obj_t * ui_secondButton;
+extern lv_obj_t * ui_firstButton;
+extern lv_obj_t * ui_thirdButton;
+extern lv_obj_t * ui_forthButton;
+extern lv_obj_t * ui_Screen1;
 extern lv_obj_t * ui_Screen2;
 extern lv_obj_t * ui_Screen3;
 extern lv_obj_t * ui_Screen4;
@@ -82,6 +98,9 @@ public:
 
 LGFX tft;
 
+extern int brightnessValue;
+
+
 /*Change to your screen resolution*/
 static const uint32_t screenWidth  = 480;
 static const uint32_t screenHeight = 320;
@@ -116,11 +135,150 @@ void my_touchpad_read( lv_indev_drv_t * indev_driver, lv_indev_data_t * data )
    }
 }
 
+const char index_html[] PROGMEM = R"rawliteral(
+<!DOCTYPE HTML><html>
+<head>
+  <title>wt32-sc01 demo controller</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    html {font-family: Arial; display: inline-block; text-align: center;}
+    h2 {font-size: 3.0rem;}
+    p {font-size: 3.0rem;}
+    body {max-width: 600px; margin:0px auto; padding-bottom: 25px;}
+    .switch {position: relative; display: inline-block; width: 120px; height: 68px} 
+    .switch input {display: none}
+    .slider {position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; border-radius: 34px}
+    .slider:before {position: absolute; content: ""; height: 52px; width: 52px; left: 8px; bottom: 8px; background-color: #fff; -webkit-transition: .4s; transition: .4s; border-radius: 68px}
+    input:checked+.slider {background-color: #2196F3}
+    input:checked+.slider:before {-webkit-transform: translateX(52px); -ms-transform: translateX(52px); transform: translateX(52px)}
+  </style>
+</head>
+<body>
+  <h2>demo controller</h2>
+  %BUTTONPLACEHOLDER%
+<script>function toggleCheckbox(element) {
+  var xhr = new XMLHttpRequest();
+  if(element.checked){ xhr.open("GET", "/update?output="+element.id+"&state=1", true); }
+  else { xhr.open("GET", "/update?output="+element.id+"&state=0", true); }
+  xhr.send();
+}
+
+setInterval(function ( ) {
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      var inputChecked1;
+      var outputStateM1;
+      if( this.responseText == 1){ 
+        inputChecked1 = true;
+        outputStateM1 = "On";
+      }
+      else { 
+        inputChecked1 = false;
+        outputStateM1 = "Off";
+      }
+      document.getElementById("1").checked = inputChecked1;
+      document.getElementById("1").innerHTML = outputStateM1;
+    }
+  };
+  xhttp.open("GET", "/state1", true);
+  xhttp.send();
+
+  var xhttp2 = new XMLHttpRequest();
+  xhttp2.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      var inputChecked2;
+      var outputStateM2;
+      if( this.responseText == 1){ 
+        inputChecked2 = true;
+        outputStateM2 = "On";
+      }
+      else { 
+        inputChecked2 = false;
+        outputStateM2 = "Off";
+      }
+      document.getElementById("2").checked = inputChecked2;
+      document.getElementById("2").innerHTML = outputStateM2;
+    }
+  };
+  xhttp2.open("GET", "/state2", true);
+  xhttp2.send();
+
+  var xhttp3 = new XMLHttpRequest();
+  xhttp3.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      var inputChecked3;
+      var outputStateM3;
+      if( this.responseText == 1){ 
+        inputChecked3 = true;
+        outputStateM3 = "On";
+      }
+      else { 
+        inputChecked3 = false;
+        outputStateM3 = "Off";
+      }
+      document.getElementById("3").checked = inputChecked3;
+      document.getElementById("3").innerHTML = outputStateM3;
+    }
+  };
+  xhttp3.open("GET", "/state3", true);
+  xhttp3.send();
+
+  var xhttp4 = new XMLHttpRequest();
+  xhttp4.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      var inputChecked4;
+      var outputStateM4;
+      if( this.responseText == 1){ 
+        inputChecked4 = true;
+        outputStateM4 = "On";
+      }
+      else { 
+        inputChecked4 = false;
+        outputStateM4 = "Off";
+      }
+      document.getElementById("4").checked = inputChecked4;
+      document.getElementById("4").innerHTML = outputStateM4;
+    }
+  };
+  xhttp4.open("GET", "/state4", true);
+  xhttp4.send();
+}, 1000 ) ;
+
+</script>
+</body>
+</html>
+)rawliteral";
+
+String outputState(lv_obj_t *ui){
+  if(lv_obj_get_state(ui)-2){
+    return "checked";
+  }
+  else {
+    return "";
+  }
+  return "";
+}
+
+// Replaces placeholder with button section in your web page
+String processor(const String& var){
+  //Serial.println(var);
+  if(var == "BUTTONPLACEHOLDER"){
+    String buttons = "";
+    buttons += "<h4> Living Room Light  </h4><label class=\"switch\"><input type=\"checkbox\" onchange=\"toggleCheckbox(this)\" id=\"1\" " "><span class=\"slider\"></span></label>";
+    buttons += "<h4> Kitchen Room Light </h4><label class=\"switch\"><input type=\"checkbox\" onchange=\"toggleCheckbox(this)\" id=\"2\" " "><span class=\"slider\"></span></label>";
+    buttons += "<h4> Curtain Mode       </h4><label class=\"switch\"><input type=\"checkbox\" onchange=\"toggleCheckbox(this)\" id=\"3\" " "><span class=\"slider\"></span></label>";
+    buttons += "<h4> AC                 </h4><label class=\"switch\"><input type=\"checkbox\" onchange=\"toggleCheckbox(this)\" id=\"4\" " "><span class=\"slider\"></span></label>";
+    return buttons;
+  }
+  return String();
+}
+
 void setup()
 {
   Serial.begin(115200);
 
-  tft.begin();        
+  tft.begin();
   tft.setRotation(1);
   tft.setBrightness(255);
 
@@ -148,20 +306,123 @@ void setup()
   indev_drv.type = LV_INDEV_TYPE_POINTER;
   indev_drv.read_cb = my_touchpad_read;
   lv_indev_drv_register(&indev_drv);
-  
+
+  WiFi.begin(ssid, password);
+  while(WiFi.status() != WL_CONNECTED) {
+    delay(10000);
+    Serial.println("Connecting to WiFi...");
+  }
+
+  Serial.println(WiFi.localIP());
+
+  server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send_P(200, "text/html", index_html, processor);
+  });
+
+  // Send a GET request to <ESP_IP>/update?output=<inputMessage1>&state=<inputMessage2>
+  server.on("/update", HTTP_GET, [] (AsyncWebServerRequest *request) {
+  String inputMessage1;
+  String inputMessage2;
+  // GET input1 value on <ESP_IP>/update?output=<inputMessage1>&state=<inputMessage2>
+  if (request->hasParam(PARAM_INPUT_1) && request->hasParam(PARAM_INPUT_2)) {
+    inputMessage1 = request->getParam(PARAM_INPUT_1)->value();
+    inputMessage2 = request->getParam(PARAM_INPUT_2)->value();
+    //digitalWrite(inputMessage1.toInt(), inputMessage2.toInt());
+    switch (inputMessage1.toInt())
+    {
+      case 1:
+        _ui_state_modify(ui_firstButton, LV_STATE_CHECKED, inputMessage2.toInt()+1);
+      break;
+
+      case 2:
+        _ui_state_modify(ui_secondButton, LV_STATE_CHECKED, inputMessage2.toInt()+1);
+        Serial.println("2");
+      break;
+
+      case 3:
+        _ui_state_modify(ui_thirdButton, LV_STATE_CHECKED, inputMessage2.toInt()+1);
+        Serial.println("3");
+      break;
+
+      case 4:
+       _ui_state_modify(ui_forthButton, LV_STATE_CHECKED, inputMessage2.toInt()+1);
+       Serial.println("4");
+      break;
+      
+      default:
+      break;
+    }
+  }
+  else {
+    inputMessage1 = "No message sent";
+    inputMessage2 = "No message sent";
+  }
+  Serial.print(inputMessage1);
+  Serial.print(" - : ");
+  Serial.println(inputMessage2);
+  request->send(200, "text/plain", "OK");
+});
+
+  server.on("/state1", HTTP_GET, [] (AsyncWebServerRequest *request) {
+    String tg = String(lv_obj_get_state(ui_firstButton)-2).c_str();
+    if(tg == "1" || tg == "0"){
+      request->send(200, "text/plain", tg);
+    }
+  });
+
+  server.on("/state2", HTTP_GET, [] (AsyncWebServerRequest *request) {
+    String tg2 = String(lv_obj_get_state(ui_secondButton)-2).c_str();
+    if(tg2 == "1" || tg2 == "0"){
+      request->send(200, "text/plain", tg2);
+    }
+  });
+
+  server.on("/state3", HTTP_GET, [] (AsyncWebServerRequest *request) {
+    String tg3 = String(lv_obj_get_state(ui_thirdButton)-2).c_str();
+    if(tg3 == "1" || tg3 == "0"){
+      request->send(200, "text/plain", tg3);
+    }
+  });
+
+  server.on("/state4", HTTP_GET, [] (AsyncWebServerRequest *request) {
+    String tg4 = String(lv_obj_get_state(ui_forthButton)-2).c_str();
+    if(tg4 == "1" || tg4 == "0"){
+      request->send(200, "text/plain", tg4);
+    }
+  });
+
+  server.begin();
+
   ui_init();
 }
 
 void loop()
 {
   lv_timer_handler(); /* let the GUI do its work */
-
+  
   tft.setBrightness(brightnessValue); //change screen brightness according to slider's value
 
   //set screen bg color acording to color wheel selected
+  lv_obj_set_style_bg_color(ui_Screen1, lv_colorwheel_get_rgb(ui_Colorwheel1), LV_PART_MAIN | LV_STATE_DEFAULT);
   lv_obj_set_style_bg_color(ui_Screen2, lv_colorwheel_get_rgb(ui_Colorwheel1), LV_PART_MAIN | LV_STATE_DEFAULT);
   lv_obj_set_style_bg_color(ui_Screen3, lv_colorwheel_get_rgb(ui_Colorwheel1), LV_PART_MAIN | LV_STATE_DEFAULT);
   lv_obj_set_style_bg_color(ui_Screen4, lv_colorwheel_get_rgb(ui_Colorwheel1), LV_PART_MAIN | LV_STATE_DEFAULT);
 
   delay( 5 );
+}
+
+void btnHandler(lv_obj_t *ui_target, bool btnstate, int flag)
+{
+  if(btnstate != flag)
+  {
+    flag = btnstate;
+    if(btnstate)
+    {
+      _ui_state_modify(ui_target, LV_STATE_CHECKED, _UI_MODIFY_STATE_TOGGLE);
+    }
+    else{
+      _ui_state_modify(ui_target, LV_STATE_CHECKED, _UI_MODIFY_STATE_REMOVE);
+    }
+  }
+  btnstate = !btnstate;
 }
