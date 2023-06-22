@@ -19,23 +19,13 @@ const char *password = "lumivn274!";
 const char* PARAM_INPUT_1 = "output";
 const char* PARAM_INPUT_2 = "state";
 
-bool btn1state = LOW;
-bool btn2state = LOW;
-bool btn3state = LOW;
-bool btn4state = LOW;
-
-int flag1 = 0;
-int flag2 = 0;
-int flag3 = 0;
-int flag4 = 0;
-
-void btnHandler(lv_obj_t *ui_target, bool btnstate, int flag);
-
 // Create AsyncWebServer object on port 80
 AsyncWebServer server(80);
 
 extern lv_obj_t * ui_secondButton;
 extern lv_obj_t * ui_firstButton;
+extern lv_obj_t * ui_thirdButton;
+extern lv_obj_t * ui_forthButton;
 extern lv_obj_t * ui_Screen1;
 extern lv_obj_t * ui_Screen2;
 extern lv_obj_t * ui_Screen3;
@@ -193,73 +183,67 @@ setInterval(function ( ) {
   };
   xhttp.open("GET", "/state1", true);
   xhttp.send();
+
+  var xhttp2 = new XMLHttpRequest();
+  xhttp2.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      var inputChecked2;
+      var outputStateM2;
+      if( this.responseText == 1){ 
+        inputChecked2 = true;
+        outputStateM2 = "On";
+      }
+      else { 
+        inputChecked2 = false;
+        outputStateM2 = "Off";
+      }
+      document.getElementById("2").checked = inputChecked2;
+      document.getElementById("2").innerHTML = outputStateM2;
+    }
+  };
+  xhttp2.open("GET", "/state2", true);
+  xhttp2.send();
+
+  var xhttp3 = new XMLHttpRequest();
+  xhttp3.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      var inputChecked3;
+      var outputStateM3;
+      if( this.responseText == 1){ 
+        inputChecked3 = true;
+        outputStateM3 = "On";
+      }
+      else { 
+        inputChecked3 = false;
+        outputStateM3 = "Off";
+      }
+      document.getElementById("3").checked = inputChecked3;
+      document.getElementById("3").innerHTML = outputStateM3;
+    }
+  };
+  xhttp3.open("GET", "/state3", true);
+  xhttp3.send();
+
+  var xhttp4 = new XMLHttpRequest();
+  xhttp4.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      var inputChecked4;
+      var outputStateM4;
+      if( this.responseText == 1){ 
+        inputChecked4 = true;
+        outputStateM4 = "On";
+      }
+      else { 
+        inputChecked4 = false;
+        outputStateM4 = "Off";
+      }
+      document.getElementById("4").checked = inputChecked4;
+      document.getElementById("4").innerHTML = outputStateM4;
+    }
+  };
+  xhttp4.open("GET", "/state4", true);
+  xhttp4.send();
 }, 1000 ) ;
-
-// setInterval(function ( ) {
-//   var xhttp = new XMLHttpRequest();
-//   xhttp.onreadystatechange = function() {
-//     if (this.readyState == 4 && this.status == 200) {
-//       var inputChecked2;
-//       var outputStateM2;
-//       if( this.responseText == 1){ 
-//         inputChecked2 = true;
-//         outputStateM2 = "On";
-//       }
-//       else { 
-//         inputChecked2 = false;
-//         outputStateM2 = "Off";
-//       }
-//       document.getElementById("2").checked = inputChecked2;
-//       document.getElementById("2").innerHTML = outputStateM2;
-//     }
-//   };
-//   xhttp.open("GET", "/state2", true);
-//   xhttp.send();
-// }, 1000 ) ;
-
-// setInterval(function ( ) {
-//   var xhttp = new XMLHttpRequest();
-//   xhttp.onreadystatechange = function() {
-//     if (this.readyState == 4 && this.status == 200) {
-//       var inputChecked3;
-//       var outputStateM3;
-//       if( this.responseText == 1){ 
-//         inputChecked3 = true;
-//         outputStateM3 = "On";
-//       }
-//       else { 
-//         inputChecked3 = false;
-//         outputStateM3 = "Off";
-//       }
-//       document.getElementById("3").checked = inputChecked3;
-//       document.getElementById("3").innerHTML = outputStateM3;
-//     }
-//   };
-//   xhttp.open("GET", "/state3", true);
-//   xhttp.send();
-// }, 1000 ) ;
-
-// setInterval(function ( ) {
-//   var xhttp = new XMLHttpRequest();
-//   xhttp.onreadystatechange = function() {
-//     if (this.readyState == 4 && this.status == 200) {
-//       var inputChecked4;
-//       var outputStateM4;
-//       if( this.responseText == 1){ 
-//         inputChecked4 = true;
-//         outputStateM4 = "On";
-//       }
-//       else { 
-//         inputChecked4 = false;
-//         outputStateM4 = "Off";
-//       }
-//       document.getElementById("4").checked = inputChecked4;
-//       document.getElementById("4").innerHTML = outputStateM4;
-//     }
-//   };
-//   xhttp.open("GET", "/state4", true);
-//   xhttp.send();
-// }, 1000 ) ;
 
 </script>
 </body>
@@ -380,20 +364,32 @@ void setup()
 });
 
   server.on("/state1", HTTP_GET, [] (AsyncWebServerRequest *request) {
-  request->send(200, "text/plain", String(lv_obj_get_state(ui_firstButton)-2).c_str());
+    String tg = String(lv_obj_get_state(ui_firstButton)-2).c_str();
+    if(tg == "1" || tg == "0"){
+      request->send(200, "text/plain", tg);
+    }
   });
 
-  // server.on("/state2", HTTP_GET, [] (AsyncWebServerRequest *request) {
-  // request->send(200, "text/plain", String(lv_obj_get_state(ui_secondButton)-2).c_str());
-  // });
+  server.on("/state2", HTTP_GET, [] (AsyncWebServerRequest *request) {
+    String tg2 = String(lv_obj_get_state(ui_secondButton)-2).c_str();
+    if(tg2 == "1" || tg2 == "0"){
+      request->send(200, "text/plain", tg2);
+    }
+  });
 
-  // server.on("/state3", HTTP_GET, [] (AsyncWebServerRequest *request) {
-  // request->send(200, "text/plain", String(lv_obj_get_state(ui_thirdButton)-2).c_str());
-  // });
+  server.on("/state3", HTTP_GET, [] (AsyncWebServerRequest *request) {
+    String tg3 = String(lv_obj_get_state(ui_thirdButton)-2).c_str();
+    if(tg3 == "1" || tg3 == "0"){
+      request->send(200, "text/plain", tg3);
+    }
+  });
 
-  // server.on("/state4", HTTP_GET, [] (AsyncWebServerRequest *request) {
-  // request->send(200, "text/plain", String(lv_obj_get_state(ui_forthButton)-2).c_str());
-  // });
+  server.on("/state4", HTTP_GET, [] (AsyncWebServerRequest *request) {
+    String tg4 = String(lv_obj_get_state(ui_forthButton)-2).c_str();
+    if(tg4 == "1" || tg4 == "0"){
+      request->send(200, "text/plain", tg4);
+    }
+  });
 
   server.begin();
 
